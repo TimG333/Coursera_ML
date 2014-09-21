@@ -1,0 +1,113 @@
+---
+title: "Machine Learning Project"
+author: "Timothy Groth"
+date: "Sunday, September 21, 2014"
+output: html_document
+---
+
+#Data and Package Loading
+
+Data is read in, packages are loaded.
+
+```{r}
+library("caret")
+library("ada")
+library("randomForest")
+exploreassignment <- read.csv("pml-training.csv")
+```
+
+#Initial Considerations
+
+Initial exploration of the data and its source indicates a great deal of variables with many NAs. These variables are dropped as they will not be as useful predictors. As a note these are the summary metrics derived from the more direct observations that remain. Some factor variables that do not have NAs but have similar issues and are also summary metrics are similarly dropped.
+
+Variables of identification were also removed due to a priori assumption of irrelevance.
+
+
+```{r, cache=TRUE}
+exclude <- grep("^amplitude",names(exploreassignment))
+workingSet <- exploreassignment[,-exclude]
+exclude <- grep("^var",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("^avg",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("^min",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("^max",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("^stddev",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("^skewness", names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("X",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("user_name",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("^kurtosis",names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("^cvtd", names(workingSet))
+workingSet <- workingSet[,-exclude]
+exclude <- grep("window$",names(workingSet))
+workingSet <- workingSet[,-exclude]
+finalKeep <- names(workingSet)
+
+```
+
+After the previously mentioned variables are dropped, the data is split into test and training sets. This is done after the initial data cleaning as the initial procedure was as much about the practicalities of handling the data on avaiable hardware as actual analysis. In more optimal conditions the summary variables would be dealt with as part of the dataset and training, and excluded in that way.
+
+
+```{r, cache=TRUE}
+
+set.seed(54321)
+inTrain <- createDataPartition(workingSet$classe, p=3/4, list=FALSE)
+training <- workingSet[inTrain,]
+testing <- workingSet[-inTrain,]
+
+```
+
+With a clean training set to look at, some exploratory work was done. There is good reason to assume there may be correlation between predictors, particular in that the wrist and weight are both monitored for position and these seem like they would be naturally connected--and connected in a way that is relevant to predicting certain classes of incorrect exercise execution. This suggests PCA as an option to getting meaningful information. We do indeed see that 54 predictors can be reduced to 19 and still explain 90% of the variance among the predictor variables.
+
+```{r, cache=TRUE}
+PCA <- prcomp(training[,-55], scale.=TRUE)
+plot(PCA)
+```
+
+As an aside, due to the constraints of the assignment a random forest model was used to maximize predictability. While this may make interpreting the model more difficult, it is likely to improve predictive ability. It may also be possible to use such a model to understand why a set of motions is triggeirng an incorrect performance class (which would be ideal in a practical situation, as simply indicating it is wrong does not provide sufficient feedback to correct the issue).
+
+```{r, cache=TRUE}
+ set.seed(54321)
+baseModel <- train(classe ~ . , data=training)
+baseModel$finalModel
+```
+
+Due to the predicted perfomance of the PCA free model and the processor constraints, no PCA model was built into this report.
+
+#Cross Validation
+
+The random forest method for caret's train function includes built in cross validation (holding cases in reserve to test built trees with). As noted above the estimated error rate is .22%.
+
+Applying to the reserved testing data we see that it, as expected, yields a higher eror rate of .99%.
+
+
+```{r, cache=TRUE}
+baseResults <- predict(baseModel,testing)
+table(baseResults,testing$classe)
+sum(baseResults == testing$classe)/length(baseResults)
+```
+
+#Final Testing
+
+Running the code from the course site to generate files to submit. Which went well.
+
+
+```{r, cache=TRUE}
+pml_write_files = function(x){
+  n = length(x)
+   for(i in 1:n){
+     filename = paste0("problem_id_",i,".txt")
+     write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+     }
+  }
+check <- read.csv("pml-testing.csv")
+finalResults <- predict(baseModel,check)
+pml_write_files(finalResults)
+```
