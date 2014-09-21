@@ -31,37 +31,167 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+        <p>Coursera_ML / ml.html
+TimG333TimG333 27 minutes ago Uploading Assignment
+1 contributor
+189 lines (164 sloc)  455.559 kb RawBlameHistory<br>
+&lt;!DOCTYPE html&gt;</p>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p></p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<p></p>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p></p>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<p></p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p></p>Machine Learning Project<p></p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+code{white-space: pre;}<p></p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+  pre:not([class]) {
+    background-color: white;
+  }
+<p></p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p></p>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+<div>
+
+
+<div>
+<h1>
+<a name="machine-learning-project" class="anchor" href="#machine-learning-project"><span class="octicon octicon-link"></span></a>Machine Learning Project</h1>
+<h4>
+<a name="timothy-groth" class="anchor" href="#timothy-groth"><span class="octicon octicon-link"></span></a><em>Timothy Groth</em>
+</h4>
+<h4>
+<a name="sunday-september-21-2014" class="anchor" href="#sunday-september-21-2014"><span class="octicon octicon-link"></span></a><em>Sunday, September 21, 2014</em>
+</h4>
+</div>
+
+<div>
+<h1>
+<a name="data-and-package-loading" class="anchor" href="#data-and-package-loading"><span class="octicon octicon-link"></span></a>Data and Package Loading</h1>
+<p>Data is read in, packages are loaded.</p>
+<pre><code>library("caret")</code></pre>
+<pre><code>## Loading required package: lattice
+## Loading required package: ggplot2</code></pre>
+<pre><code>library("ada")</code></pre>
+<pre><code>## Loading required package: rpart</code></pre>
+<pre><code>library("randomForest")</code></pre>
+<pre><code>## randomForest 4.6-10
+## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>exploreassignment &lt;- read.csv("pml-training.csv")</code></pre>
+</div>
+
+<div>
+<h1>
+<a name="initial-considerations" class="anchor" href="#initial-considerations"><span class="octicon octicon-link"></span></a>Initial Considerations</h1>
+<p>Initial exploration of the data and its source indicates a great deal of variables with many NAs. These variables are dropped as they will not be as useful predictors. As a note these are the summary metrics derived from the more direct observations that remain. Some factor variables that do not have NAs but have similar issues and are also summary metrics are similarly dropped.</p>
+<p>Variables of identification were also removed due to a priori assumption of irrelevance.</p>
+<pre><code>exclude &lt;- grep("^amplitude",names(exploreassignment))
+workingSet &lt;- exploreassignment[,-exclude]
+exclude &lt;- grep("^var",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("^avg",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("^min",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("^max",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("^stddev",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("^skewness", names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("X",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("user_name",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("^kurtosis",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("^cvtd", names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+exclude &lt;- grep("window$",names(workingSet))
+workingSet &lt;- workingSet[,-exclude]
+finalKeep &lt;- names(workingSet)</code></pre>
+<p>After the previously mentioned variables are dropped, the data is split into test and training sets. This is done after the initial data cleaning as the initial procedure was as much about the practicalities of handling the data on avaiable hardware as actual analysis. In more optimal conditions the summary variables would be dealt with as part of the dataset and training, and excluded in that way.</p>
+<pre><code>set.seed(54321)
+inTrain &lt;- createDataPartition(workingSet$classe, p=3/4, list=FALSE)
+training &lt;- workingSet[inTrain,]
+testing &lt;- workingSet[-inTrain,]</code></pre>
+<p>With a clean training set to look at, some exploratory work was done. There is good reason to assume there may be correlation between predictors, particular in that the wrist and weight are both monitored for position and these seem like they would be naturally connected–and connected in a way that is relevant to predicting certain classes of incorrect exercise execution. This suggests PCA as an option to getting meaningful information. We do indeed see that 54 predictors can be reduced to 19 and still explain 90% of the variance among the predictor variables.</p>
+<pre><code>PCA &lt;- prcomp(training[,-55], scale.=TRUE)
+plot(PCA)</code></pre>
+<p><img title="plot of chunk unnamed-chunk-4" alt="plot of chunk unnamed-chunk-4" width="672"></p>
+<p>As an aside, due to the constraints of the assignment a random forest model was used to maximize predictability. While this may make interpreting the model more difficult, it is likely to improve predictive ability. It may also be possible to use such a model to understand why a set of motions is triggeirng an incorrect performance class (which would be ideal in a practical situation, as simply indicating it is wrong does not provide sufficient feedback to correct the issue).</p>
+<pre><code> set.seed(54321)
+baseModel &lt;- train(classe ~ . , data=training)
+baseModel$finalModel</code></pre>
+<pre><code>## 
+## Call:
+##  randomForest(x = x, y = y, mtry = param$mtry) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 28
+## 
+##         OOB estimate of  error rate: 0.22%
+## Confusion matrix:
+##      A    B    C    D    E class.error
+## A 4184    1    0    0    0   0.0002389
+## B    5 2841    2    0    0   0.0024579
+## C    0    6 2557    4    0   0.0038956
+## D    0    0    7 2403    2   0.0037313
+## E    0    0    3    2 2701   0.0018477</code></pre>
+<p>Due to the predicted perfomance of the PCA free model and the processor constraints, no PCA model was built into this report.</p>
+</div>
+
+<div>
+<h1>
+<a name="cross-validation" class="anchor" href="#cross-validation"><span class="octicon octicon-link"></span></a>Cross Validation</h1>
+<p>The random forest method for caret’s train function includes built in cross validation (holding cases in reserve to test built trees with). As noted above the estimated error rate is .22%.</p>
+<p>Applying to the reserved testing data we see that it, as expected, yields a higher eror rate of .99%.</p>
+<pre><code>baseResults &lt;- predict(baseModel,testing)
+table(baseResults,testing$classe)</code></pre>
+<pre><code>##            
+## baseResults    A    B    C    D    E
+##           A 1395    2    0    0    0
+##           B    0  947    0    0    0
+##           C    0    0  852    1    0
+##           D    0    0    3  802    1
+##           E    0    0    0    1  900</code></pre>
+<pre><code>sum(baseResults == testing$classe)/length(baseResults)</code></pre>
+<pre><code>## [1] 0.9984</code></pre>
+</div>
+
+<div>
+<h1>
+<a name="final-testing" class="anchor" href="#final-testing"><span class="octicon octicon-link"></span></a>Final Testing</h1>
+<p>Running the code from the course site to generate files to submit. Which went well.</p>
+<pre><code>pml_write_files = function(x){
+  n = length(x)
+   for(i in 1:n){
+     filename = paste0("problem_id_",i,".txt")
+     write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+     }
+  }
+check &lt;- read.csv("pml-testing.csv")
+finalResults &lt;- predict(baseModel,check)
+pml_write_files(finalResults)</code></pre>
+</div>
+
+<p></p>
+</div>
+
+<p>
+</p>
       </section>
     </div>
 
